@@ -7,7 +7,9 @@ find_package(OpenGL REQUIRED)
 find_package(glfw3 3.3 REQUIRED)
 find_package(glad REQUIRED)
 
-add_executable(gl_learn main.cpp)
+add_executable(gl_learn
+		main.cpp
+		util/shader.hpp)
 
 target_link_libraries(
 		gl_learn
