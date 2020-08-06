@@ -53,15 +53,26 @@ int main(int argc, char **argv) {
 
 	// region Data
 	// region static
-	const int vertices_count = 3;
+	const int vertices_count = 4;
 	const int vertices_size = vertices_count * (3);
 	float vertices[vertices_size] = {
 			// Positions
 			-0.5f, -0.5f, 0.0f,
 			 0.5f, -0.5f, 0.0f,
-			 0.0f,  0.5f, 0.0f,
+			 0.5f,  0.5f, 0.0f,
+			-0.5f,  0.5f, 0.0f,
+	};
+	unsigned int indices[6] = {
+			0, 1, 3,
+			1, 2, 3,
 	};
 	// endregion
+
+	// Element buffer
+	GLuint ebo;
+	glGenBuffers(1, &ebo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
 
 	// Shader
 	shader program = shader{"shaders/default.vs.glsl", "shaders/default.fs.glsl"};
@@ -93,7 +104,8 @@ int main(int argc, char **argv) {
 		processInput(window);
 
 		// region Rendering
-		glDrawArrays(GL_TRIANGLES, 0, vertices_count);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)nullptr);
 		// endregion
 
 		glfwSwapBuffers(window);
