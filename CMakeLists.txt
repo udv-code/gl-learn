@@ -9,7 +9,8 @@ find_package(glad REQUIRED)
 
 add_executable(gl_learn
 		main.cpp
-		util/shader.hpp)
+		util/shader.hpp
+		util/stb_image.h)
 
 target_link_libraries(
 		gl_learn

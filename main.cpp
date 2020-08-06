@@ -1,7 +1,10 @@
 #include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
 #include "util/shader.hpp"
+#define STB_IMAGE_IMPLEMENTATION
+#include "util/stb_image.h"
 
 //region Constants
 constexpr int window_width = 800;
@@ -54,17 +57,41 @@ int main(int argc, char **argv) {
 	// region Data
 	// region static
 	const int vertices_count = 3;
-	const int vertices_size = vertices_count * (3 + 3);
+	const int vertices_size = vertices_count * (3 + 3 + 3);
 	float vertices[vertices_size] = {
-			// positions          // colors
-			 0.5f, -0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   // bottom right
-			-0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   // bottom left
-			 0.0f,  0.5f, 0.0f,   0.0f, 0.0f, 1.0f    // top
+			// positions          // colors           // Texture coords
+			-0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   0.0f, 0.0f,   // bottom left
+			 0.5f, -0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+			 0.0f,  0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.5f, 1.0f,   // top
 	};
 	unsigned int indices[3] = {
 			0, 1, 2,
 	};
 	// endregion
+
+	// Texture
+	GLuint texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	int width, height, nrChannels;
+	unsigned char *data = stbi_load("assets/textures/wall.jpg", &width, &height, &nrChannels, 0);
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cerr << "Failed to load texture" << std::endl;
+		return -1;
+	}
+	stbi_image_free(data);
 
 	// Element buffer
 	GLuint ebo;
@@ -88,11 +115,14 @@ int main(int argc, char **argv) {
 
 	// Attributes
 	//// Position
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), nullptr);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);
 	glEnableVertexAttribArray(0);
 	//// Color
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) (3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
+	//// Texture coordinate
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 
 	program.use();
 	// endregion
