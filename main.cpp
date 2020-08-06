@@ -53,18 +53,16 @@ int main(int argc, char **argv) {
 
 	// region Data
 	// region static
-	const int vertices_count = 4;
-	const int vertices_size = vertices_count * (3);
+	const int vertices_count = 3;
+	const int vertices_size = vertices_count * (3 + 3);
 	float vertices[vertices_size] = {
-			// Positions
-			-0.5f, -0.5f, 0.0f,
-			 0.5f, -0.5f, 0.0f,
-			 0.5f,  0.5f, 0.0f,
-			-0.5f,  0.5f, 0.0f,
+			// positions          // colors
+			 0.5f, -0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   // bottom right
+			-0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   // bottom left
+			 0.0f,  0.5f, 0.0f,   0.0f, 0.0f, 1.0f    // top
 	};
-	unsigned int indices[6] = {
-			0, 1, 3,
-			1, 2, 3,
+	unsigned int indices[3] = {
+			0, 1, 2,
 	};
 	// endregion
 
@@ -90,8 +88,11 @@ int main(int argc, char **argv) {
 
 	// Attributes
 	//// Position
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), nullptr);
 	glEnableVertexAttribArray(0);
+	//// Color
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) (3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 
 	program.use();
 	// endregion
@@ -105,7 +106,7 @@ int main(int argc, char **argv) {
 
 		// region Rendering
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)nullptr);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void *) nullptr);
 		// endregion
 
 		glfwSwapBuffers(window);
